@@ -53,6 +53,9 @@ const App: React.FC = () => {
         setUser(null);
     };
 
+    // TODO: Implement protected API calls
+    console.log('Auth token', authToken);
+
     useEffect(() => {
         const loadCompanies = async () => {
             try {
