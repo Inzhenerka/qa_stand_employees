@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     Dialog,
     DialogContent,
@@ -10,20 +10,26 @@ import {
     Button,
     Chip,
     Divider,
+    TextField,
 } from "@mui/material";
 import { Employee } from "../types";
 
 interface EmployeeDetailsPopupProps {
-    employee: Employee | null;
+    employee: Employee;
+    onDelete: (id: number) => void;
     open: boolean;
     onClose: () => void;
 }
 
 const EmployeeDetailsPopup: React.FC<EmployeeDetailsPopupProps> = ({
     employee,
+    onDelete,
     open,
     onClose,
 }) => {
+    const [editMode, setEditMode] = useState(false);
+    const [editedEmployee, setEditedEmployee] = useState(employee);
+
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <Card>
@@ -82,6 +88,9 @@ const EmployeeDetailsPopup: React.FC<EmployeeDetailsPopupProps> = ({
                         )}
                     </CardContent>
                     <CardActions sx={{ justifyContent: "flex-end" }}>
+                        <Button size="small" onClick={() => onDelete(employee.id)}>
+                            {"Удалить"}
+                        </Button>
                         <Button size="small" onClick={onClose}>
                             Закрыть
                         </Button>

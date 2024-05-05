@@ -53,6 +53,10 @@ const App: React.FC = () => {
         setUser(null);
     };
 
+    const handleDeleteEmployee = (id: number) => {
+        console.log("Deleting employee", id);
+    };
+
     // TODO: Implement protected API calls
     console.log('Auth token', authToken);
 
@@ -131,6 +135,7 @@ const App: React.FC = () => {
                 {employeeForDetails && (
                     <EmployeeDetailsPopup
                         employee={employeeForDetails}
+                        onDelete={handleDeleteEmployee}
                         open={isEmployeeDetailsPopupOpen}
                         onClose={() => setIsEmployeeDetailsPopupOpen(false)}
                     />
