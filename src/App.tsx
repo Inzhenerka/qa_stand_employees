@@ -53,6 +53,10 @@ const App: React.FC = () => {
         setUser(null);
     };
 
+    const handleDeleteCompany = (id: number) => {
+        console.log("Deleting company", id);
+    };
+
     const handleDeleteEmployee = (id: number) => {
         console.log("Deleting employee", id);
     };
@@ -129,6 +133,7 @@ const App: React.FC = () => {
                     <CompanyDetailsPopup
                         company={companyForDetails}
                         open={isDetailsPopupOpen}
+                        onDelete={handleDeleteCompany}
                         onClose={() => setIsDetailsPopupOpen(false)}
                     />
                 )}

@@ -14,14 +14,16 @@ import {
 import { Company } from "../types";
 
 interface CompanyDetailsPopupProps {
-    company: Company | null;
+    company: Company;
     open: boolean;
+    onDelete: (id: number) => void;
     onClose: () => void;
 }
 
 const CompanyDetailsPopup: React.FC<CompanyDetailsPopupProps> = ({
     company,
     open,
+    onDelete,
     onClose,
 }) => {
     return (
@@ -61,6 +63,9 @@ const CompanyDetailsPopup: React.FC<CompanyDetailsPopupProps> = ({
                         )}
                     </CardContent>
                     <CardActions sx={{ justifyContent: "flex-end" }}>
+                        <Button size="small" onClick={() => onDelete(company.id)}>
+                            {"Удалить"}
+                        </Button>
                         <Button size="small" onClick={onClose}>
                             Закрыть
                         </Button>
