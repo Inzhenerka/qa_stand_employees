@@ -16,6 +16,7 @@ import Employees from "./components/Employees";
 import CompanyDetailsPopup from "./components/CompanyDetailsPopup";
 import EmployeeDetailsPopup from "./components/EmployeeDetailsPopup";
 import NewCompanyPopup from "./components/NewCompanyPopup";
+import NewEmployeePopup from "./components/NewEmployeePopup";
 import ErrorDialog from "./components/ErrorDialog";
 import {
     login,
@@ -24,6 +25,7 @@ import {
     setCompanyStatus,
     deleteCompany,
     addCompany,
+    addEmployee,
 } from "./services/api";
 
 const App: React.FC = () => {
@@ -46,12 +48,25 @@ const App: React.FC = () => {
 
     const [isNewCompanyPopupOpen, setIsNewCompanyPopupOpen] =
         useState<boolean>(false);
+    const [isNewEmployeePopupOpen, setIsNewEmployeePopupOpen] =
+        useState<boolean>(false);
 
     const loadCompanies = async () => {
         try {
             const data = await fetchCompanies();
             setCompanies(data);
             return data;
+        } catch (error: any) {
+            console.error(error);
+            setErrorMessage(error.message || "");
+            setIsErrorDialogOpen(true);
+        }
+    };
+
+    const loadEmployees = async (companyId: number) => {
+        try {
+            const data = await fetchEmployees(companyId);
+            setEmployees(data);
         } catch (error: any) {
             console.error(error);
             setErrorMessage(error.message || "");
@@ -121,24 +136,29 @@ const App: React.FC = () => {
         }
     };
 
+    const handleAddNewEmployee = async (
+        firstName: string,
+        lastName: string,
+        email: string,
+        phone: string
+    ) => {
+        if (authToken && selectedCompany) {
+            console.log("Adding new employee", firstName, lastName);
+            await addEmployee(selectedCompany, firstName, lastName, email, phone, authToken);
+            await loadEmployees(selectedCompany);
+            setIsNewEmployeePopupOpen(false);
+        } else {
+            console.error("User is not authenticated or company not selected");
+        }
+    };
+
     useEffect(() => {
         loadCompanies();
     }, []);
 
     useEffect(() => {
         if (!selectedCompany) return;
-        const loadEmployees = async () => {
-            try {
-                const data = await fetchEmployees(selectedCompany);
-                setEmployees(data);
-            } catch (error: any) {
-                console.error(error);
-                setErrorMessage(error.message || "");
-                setIsErrorDialogOpen(true);
-            }
-        };
-
-        loadEmployees();
+        loadEmployees(selectedCompany);
     }, [selectedCompany]);
 
     return (
@@ -171,6 +191,9 @@ const App: React.FC = () => {
                     <Grid item xs={12} md={6}>
                         <Employees
                             employees={employees}
+                            onOpenNewEmployeePopup={() =>
+                                setIsNewEmployeePopupOpen(true)
+                            }
                             onOpenDetails={(employee: Employee) => {
                                 setEmployeeForDetails(employee);
                                 setIsEmployeeDetailsPopupOpen(true);
@@ -198,6 +221,11 @@ const App: React.FC = () => {
                     open={isNewCompanyPopupOpen}
                     onClose={() => setIsNewCompanyPopupOpen(false)}
                     onAdd={handleAddNewCompany}
+                />
+                <NewEmployeePopup
+                    open={isNewEmployeePopupOpen}
+                    onClose={() => setIsNewEmployeePopupOpen(false)}
+                    onAdd={handleAddNewEmployee}
                 />
                 <ErrorDialog
                     open={isErrorDialogOpen}

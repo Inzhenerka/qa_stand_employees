@@ -83,3 +83,26 @@ export const addCompany = async (name: string, description: string, token: strin
 
   return response.json() as Promise<Company>;
 };
+
+export const addEmployee = async (companyId: number, firstName: string, lastName: string, email: string, phone: string, token: string): Promise<Employee> => {
+  const response = await fetch(`${API_URL}/employee`, {
+    method: 'POST',
+    headers: {
+      'x-client-token': token,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      companyId: companyId,
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      phone: phone,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create employee');
+  }
+
+  return response.json() as Promise<Employee>;
+};
