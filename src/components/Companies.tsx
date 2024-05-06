@@ -7,8 +7,10 @@ import {
     Typography,
     ListItemIcon,
     IconButton,
+    Grid,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
+import AddIcon from "@mui/icons-material/Add";
 import { Company } from "../types";
 
 interface CompaniesProps {
@@ -16,18 +18,29 @@ interface CompaniesProps {
     selectedCompany: number | null;
     onSelectCompany: (id: number) => void;
     onOpenDetails: (company: Company) => void; // Added prop for opening details
+    onOpenNewCompanyPopup: () => void;
 }
 
 const Companies: React.FC<CompaniesProps> = ({
     companies,
     selectedCompany,
     onSelectCompany,
-    onOpenDetails, // Function to handle opening the details
+    onOpenDetails,
+    onOpenNewCompanyPopup, // Function to handle opening the details
 }) => (
     <>
-        <Typography variant="h6" gutterBottom>
-            Компании
-        </Typography>
+        <Grid container alignItems="center" spacing={2}>
+            <Grid item>
+                <Typography variant="h6" gutterBottom>
+                    Компании
+                </Typography>
+            </Grid>
+            <Grid item>
+                <IconButton onClick={onOpenNewCompanyPopup}>
+                    <AddIcon />
+                </IconButton>
+            </Grid>
+        </Grid>
         <Box
             sx={{
                 maxHeight: "400px",

@@ -15,8 +15,16 @@ import Companies from "./components/Companies";
 import Employees from "./components/Employees";
 import CompanyDetailsPopup from "./components/CompanyDetailsPopup";
 import EmployeeDetailsPopup from "./components/EmployeeDetailsPopup";
+import NewCompanyPopup from "./components/NewCompanyPopup";
 import ErrorDialog from "./components/ErrorDialog";
-import { login, fetchCompanies, fetchEmployees, setCompanyStatus, deleteCompany } from "./services/api";
+import {
+    login,
+    fetchCompanies,
+    fetchEmployees,
+    setCompanyStatus,
+    deleteCompany,
+    addCompany,
+} from "./services/api";
 
 const App: React.FC = () => {
     const [isErrorDialogOpen, setIsErrorDialogOpen] = useState<boolean>(false);
@@ -35,6 +43,9 @@ const App: React.FC = () => {
         useState<boolean>(false);
     const [employeeForDetails, setEmployeeForDetails] =
         useState<Employee | null>(null);
+
+    const [isNewCompanyPopupOpen, setIsNewCompanyPopupOpen] =
+        useState<boolean>(false);
 
     const loadCompanies = async () => {
         try {
@@ -75,12 +86,25 @@ const App: React.FC = () => {
                 return;
             }
             // Find the updated company details
-            const updatedCompany = updatedCompanies.find(company => company.id === id);
+            const updatedCompany = updatedCompanies.find(
+                (company) => company.id === id
+            );
             if (updatedCompany) {
                 setCompanyForDetails(updatedCompany);
             } else {
                 console.error("Company not found in the list");
             }
+        } else {
+            console.error("User is not authenticated");
+        }
+    };
+
+    const handleAddNewCompany = async (name: string, description: string) => {
+        if (authToken) {
+            console.log("Adding new company", name, description);
+            await addCompany(name, description, authToken);
+            setIsNewCompanyPopupOpen(false);
+            const updatedCompanies = await loadCompanies();
         } else {
             console.error("User is not authenticated");
         }
@@ -135,6 +159,9 @@ const App: React.FC = () => {
                             companies={companies}
                             selectedCompany={selectedCompany}
                             onSelectCompany={setSelectedCompany}
+                            onOpenNewCompanyPopup={() =>
+                                setIsNewCompanyPopupOpen(true)
+                            }
                             onOpenDetails={(company: Company) => {
                                 setCompanyForDetails(company);
                                 setIsDetailsPopupOpen(true);
@@ -167,6 +194,11 @@ const App: React.FC = () => {
                         onClose={() => setIsEmployeeDetailsPopupOpen(false)}
                     />
                 )}
+                <NewCompanyPopup
+                    open={isNewCompanyPopupOpen}
+                    onClose={() => setIsNewCompanyPopupOpen(false)}
+                    onAdd={handleAddNewCompany}
+                />
                 <ErrorDialog
                     open={isErrorDialogOpen}
                     errorMessage={errorMessage}

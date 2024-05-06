@@ -63,3 +63,23 @@ export const setCompanyStatus = async (id: number, isActive: boolean, token: str
     throw new Error('Failed to deactivate company');
   }
 };
+
+export const addCompany = async (name: string, description: string, token: string): Promise<Company> => {
+  const response = await fetch(`${API_URL}/company`, {
+    method: 'POST',
+    headers: {
+      'x-client-token': token,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      name: name,
+      description: description,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create company');
+  }
+
+  return response.json() as Promise<Company>;
+};
