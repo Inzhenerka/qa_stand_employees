@@ -16,7 +16,7 @@ import Employees from "./components/Employees";
 import CompanyDetailsPopup from "./components/CompanyDetailsPopup";
 import EmployeeDetailsPopup from "./components/EmployeeDetailsPopup";
 import ErrorDialog from "./components/ErrorDialog";
-import { login, fetchCompanies, fetchEmployees } from "./services/api";
+import { login, fetchCompanies, fetchEmployees, setCompanyStatus, deleteCompany } from "./services/api";
 
 const App: React.FC = () => {
     const [isErrorDialogOpen, setIsErrorDialogOpen] = useState<boolean>(false);
@@ -36,6 +36,18 @@ const App: React.FC = () => {
     const [employeeForDetails, setEmployeeForDetails] =
         useState<Employee | null>(null);
 
+    const loadCompanies = async () => {
+        try {
+            const data = await fetchCompanies();
+            setCompanies(data);
+            return data;
+        } catch (error: any) {
+            console.error(error);
+            setErrorMessage(error.message || "");
+            setIsErrorDialogOpen(true);
+        }
+    };
+
     const handleLogin = async (username: string, password: string) => {
         try {
             const data = await login({ username, password });
@@ -53,29 +65,39 @@ const App: React.FC = () => {
         setUser(null);
     };
 
-    const handleDeleteCompany = (id: number) => {
-        console.log("Deleting company", id);
+    const handleSetCompanyStatus = async (id: number, isActive: boolean) => {
+        if (authToken) {
+            console.log("Setting company status", id, isActive);
+            await setCompanyStatus(id, isActive, authToken);
+            const updatedCompanies = await loadCompanies();
+            if (!updatedCompanies) {
+                console.error("Failed to update companies list");
+                return;
+            }
+            // Find the updated company details
+            const updatedCompany = updatedCompanies.find(company => company.id === id);
+            if (updatedCompany) {
+                setCompanyForDetails(updatedCompany);
+            } else {
+                console.error("Company not found in the list");
+            }
+        } else {
+            console.error("User is not authenticated");
+        }
     };
 
-    const handleDeleteEmployee = (id: number) => {
-        console.log("Deleting employee", id);
+    const handleDeleteCompany = async (id: number) => {
+        if (authToken) {
+            console.log("Deleting company", id);
+            await deleteCompany(id, authToken);
+            const updatedCompanies = await loadCompanies();
+            setIsDetailsPopupOpen(false);
+        } else {
+            console.error("User is not authenticated");
+        }
     };
-
-    // TODO: Implement protected API calls
-    console.log('Auth token', authToken);
 
     useEffect(() => {
-        const loadCompanies = async () => {
-            try {
-                const data = await fetchCompanies();
-                setCompanies(data);
-            } catch (error: any) {
-                console.error(error);
-                setErrorMessage(error.message || "");
-                setIsErrorDialogOpen(true);
-            }
-        };
-
         loadCompanies();
     }, []);
 
@@ -133,6 +155,7 @@ const App: React.FC = () => {
                     <CompanyDetailsPopup
                         company={companyForDetails}
                         open={isDetailsPopupOpen}
+                        onSetStatus={handleSetCompanyStatus}
                         onDelete={handleDeleteCompany}
                         onClose={() => setIsDetailsPopupOpen(false)}
                     />
@@ -140,7 +163,6 @@ const App: React.FC = () => {
                 {employeeForDetails && (
                     <EmployeeDetailsPopup
                         employee={employeeForDetails}
-                        onDelete={handleDeleteEmployee}
                         open={isEmployeeDetailsPopupOpen}
                         onClose={() => setIsEmployeeDetailsPopupOpen(false)}
                     />

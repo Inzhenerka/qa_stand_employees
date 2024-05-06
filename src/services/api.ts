@@ -32,3 +32,34 @@ export const fetchEmployees = async (selectedCompany: number): Promise<Employee[
   }
   return response.json() as Promise<Employee[]>;
 };
+
+export const deleteCompany = async (id: number, token: string): Promise<void> => {
+  const response = await fetch(`${API_URL}/company/delete/${id}`, {
+    method: 'GET',
+    headers: {
+      'x-client-token': token,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to delete company');
+  }
+};
+
+export const setCompanyStatus = async (id: number, isActive: boolean, token: string): Promise<void> => {
+  const response = await fetch(`${API_URL}/company/status/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'x-client-token': token,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      isActive: isActive,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to deactivate company');
+  }
+};

@@ -16,6 +16,7 @@ import { Company } from "../types";
 interface CompanyDetailsPopupProps {
     company: Company;
     open: boolean;
+    onSetStatus: (id: number, isActive: boolean) => void;
     onDelete: (id: number) => void;
     onClose: () => void;
 }
@@ -23,6 +24,7 @@ interface CompanyDetailsPopupProps {
 const CompanyDetailsPopup: React.FC<CompanyDetailsPopupProps> = ({
     company,
     open,
+    onSetStatus,
     onDelete,
     onClose,
 }) => {
@@ -63,6 +65,9 @@ const CompanyDetailsPopup: React.FC<CompanyDetailsPopupProps> = ({
                         )}
                     </CardContent>
                     <CardActions sx={{ justifyContent: "flex-end" }}>
+                        <Button size="small" onClick={() => onSetStatus(company.id, !company.isActive)}>
+                            {company.isActive ? "Деактивировать" : "Активировать"}
+                        </Button>
                         <Button size="small" onClick={() => onDelete(company.id)}>
                             {"Удалить"}
                         </Button>
