@@ -29,6 +29,11 @@ jobs:
             - name: Build project
               run: npm run build-dist
 
+            - name: Echo current directory
+              run: |
+                pwd
+                ls
+
             - name: Deploy
               uses: peaceiris/actions-gh-pages@v4
               if: github.ref == 'refs/heads/main'
